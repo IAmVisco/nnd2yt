@@ -1,18 +1,18 @@
 import * as express from 'express'
-import { niconico, Nicovideo } from 'niconico'
+import NicoService from '../services/NicoService'
 import asyncHandler from '../utils/asyncHandler'
 
 const router: express.Router = express.Router()
 
 router.post('/', asyncHandler(async (req: express.Request, res: express.Response) => {
   const { videoId } = req.body
+  const nicoService = new NicoService(req.io)
 
-  const session = await niconico.login(process.env.NICO_EMAIL, process.env.NICO_PASSWORD)
-  const client = new Nicovideo(session)
-  // TODO: check if it times out
-  const filePath = await client.download(videoId, './temp')
+  await nicoService.login(process.env.NICO_EMAIL, process.env.NICO_PASSWORD)
+  const data = await nicoService.download(videoId, './temp')
+  console.log('Finished downloading')
 
-  res.send(`Downloaded ${filePath}`)
+  res.json(data)
 }))
 
 export default router
