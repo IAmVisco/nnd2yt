@@ -8,15 +8,15 @@ import * as tough from 'tough-cookie'
 import * as socketIo from 'socket.io'
 
 import { IWatchData } from '../types/nico'
-import formatBytes from '../utils/formatBytes'
 import { HttpException } from '../utils/errorMiddleware'
+import formatBytes from '../utils/formatBytes'
 
 // Based on https://github.com/uetchy/niconico
 export default class NicoService {
   private readonly cookieJar: tough.CookieJar
   private readonly client: AxiosInstance
   private readonly baseApiUrl: string = 'https://www.nicovideo.jp/watch/'
-  private readonly loginUrl = 'https://account.nicovideo.jp/api/v1/login?site=niconico&next_url='
+  private readonly loginUrl: string = 'https://account.nicovideo.jp/api/v1/login?site=niconico&next_url='
 
   constructor(private readonly io: socketIo.Server) {
     this.io = io
@@ -67,7 +67,7 @@ export default class NicoService {
 
   public async download(videoID: string, targetPath: string): Promise<string> {
     const data = await this.watch(videoID)
-    const fileName = filenamify(data.video.title) + '.' + data.video.movieType
+    const fileName = `${filenamify(data.video.title)}.${data.video.movieType}`
     const filePath = resolve(join(targetPath, fileName))
     const exportedPath = await this._httpExport(data.video.smileInfo.url, filePath)
 
